@@ -6,7 +6,8 @@ mastermind.c - a simple text-based C program to play the game "mastermind"
 
 Copyright (c) 2022 by Znaidi M. Anas.
 
-Github repo: https://github.com/Zeta-Naidi/Mastermind-in-C
+
+
 
 ==========================================================================
 
@@ -49,9 +50,9 @@ main()
     colour[4] = 'O';
     colour[5] = 'P';
 
-    MAXNUMTRIES = 1000*pow(NUMCOLS, WIDTH);
+    MAXNUMTRIES = 10;
 
-    printf("\n\nWelcome to mastermind, Colors are: R G B Y O P.\n");
+    printf("\n\nWelcome to mastermind, made by ZETA.%d\n", MAXNUMTRIES);
 
     while (1) {
         printf("\nChoose [p]layer or [c]omputer to guess: ");
@@ -78,7 +79,7 @@ playerguess()
     int guessnum = 0;
 
     /* Make up random true. */
-    randnorep(true);
+    randcode(true);
     /* output(true);  REMOVE THIS LATER! */
     printf("\nOkay, I've made up a secret length-%d code.  ", WIDTH);
     showcolours();
@@ -99,7 +100,7 @@ playerguess()
 	output(guess);
 
 	countmatches(true, guess);
-	printf(".     numexact = %d;  numwrongplace = %d.\n", numexact, nummissed);
+	printf(".     numExact = %d;  numWrongPlace = %d.\n", numexact, nummissed);
 
     }
 
@@ -137,7 +138,7 @@ computerguess()
 		giveup = 1;
                 break;
 	    }
-	    randnorep(guesses[guessnum]);
+	    randcode(guesses[guessnum]);
 	    possible = 1;
 	    if (guessnum>1) {
 	        for(compnum=1; compnum<guessnum; compnum++) {
@@ -238,8 +239,7 @@ countmatches(int data1[WIDTH], int data2[WIDTH])
 
 }
 
-
-randnorep(int result[WIDTH])
+randcode(int result[WIDTH])
 {
     int match;
 
@@ -258,6 +258,27 @@ randnorep(int result[WIDTH])
 	}
     }
 }
+
+/*randcode(int result[WIDTH])
+{
+    int match;
+
+    for (i=0; i<WIDTH; i++) {
+	match = 1;
+	while (match==1) {
+	    result[i] = ifloor( NUMCOLS * drand48() );
+	    match = 0;
+	    if (i>0) {
+	        for (j=0; j<i; j++) {
+		    if (result[j]==result[i]) {
+		        match=1;
+		    }
+		}
+	    }
+	}
+    }
+}
+*/
 
 
 output(int therow[WIDTH])
