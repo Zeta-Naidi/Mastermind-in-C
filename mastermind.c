@@ -6,8 +6,7 @@ mastermind.c - a simple text-based C program to play the game "mastermind"
 
 Copyright (c) 2022 by Znaidi M. Anas.
 
-
-
+Github repo: https://github.com/Zeta-Naidi/Mastermind-in-C
 
 ==========================================================================
 
