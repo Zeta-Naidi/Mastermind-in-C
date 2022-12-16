@@ -3,7 +3,7 @@
 
 mastermind.c - a simple text-based C program which simulates the game "mastermind"
 
-Copyright (c) 2022 by Znaidi Mohamed Anas.
+Copyright (c) 2022 by Znaidi M. Anas.
 
 Github repo: https://github.com/Zeta-Naidi/Mastermind-in-C
 
@@ -16,7 +16,7 @@ Github repo: https://github.com/Zeta-Naidi/Mastermind-in-C
 #include <math.h>
 #include <string.h>
 
-#define WIDTH 4
+#define WIDTH 5
 #define NUMCOLS 6
 #define MAXGUESSES 10
 
@@ -56,8 +56,12 @@ int main()
     colour[3] = 'Y';
     colour[4] = 'O';
     colour[5] = 'P';
+    //colour[6] = 'W';
+    //colour[7] = 'E';
+    //colour[8] = 'A';
+    //colour[9] = 'I';
 
-    MAXNUMTRIES = 12000;
+    //MAXNUMTRIES = 12000;
     MAXNUMTRIES = 1000 * pow(NUMCOLS, WIDTH);
 
     printf("\n***********************************\n");
@@ -90,7 +94,8 @@ int playerguess()
 
     /* Make up random true. */
     randcode(true);
-    /* output(true);  REMOVE THIS LATER! */
+    
+    output(true); /* Print secret code __ REMOVE THIS LATER! */
     printf("\nOkay, I've made up a secret code with length -> %d .  ", WIDTH);
     showcolours();
 
