@@ -1,15 +1,13 @@
 /*
-
 ==========================================================================
 
-mastermind.c - a simple text-based C program to play the game "mastermind"
+mastermind.c - a simple text-based C program which simulates the game "mastermind"
 
 Copyright (c) 2022 by Znaidi M. Anas.
 
 Github repo: https://github.com/Zeta-Naidi/Mastermind-in-C
 
 ==========================================================================
-
 */
 
 #include <stdio.h>
@@ -32,8 +30,18 @@ int nummissed;
 int i,j;
 int MAXNUMTRIES;
 
-main()
+int playerguess();
+int computerguess();
+int convert(char string[WIDTH+1], int result[WIDTH]);
+int countmatches(int data1[WIDTH], int data2[WIDTH]);
+int randcode(int result[WIDTH]);
+char output(int therow[WIDTH]);
+int showcolours();
+int min(int aa, int bb);
+int IntfloorReturn(double x);
+int seedrand();
 
+int main()
 {
     int true[WIDTH];
     int guess[WIDTH];
@@ -49,9 +57,12 @@ main()
     colour[4] = 'O';
     colour[5] = 'P';
 
-    MAXNUMTRIES = 10;
+    MAXNUMTRIES = 12000;
+    MAXNUMTRIES = 1000 * pow(NUMCOLS, WIDTH);
 
-    printf("\n\nWelcome to mastermind, made by ZETA.%d\n", MAXNUMTRIES);
+    printf("\n***********************************\n");
+      printf("WELCOME TO MASTERMIND, made by ZETA.");
+    printf("\n___________________________________\n");
 
     while (1) {
         printf("\nChoose [p]layer or [c]omputer to guess: ");
@@ -71,7 +82,7 @@ main()
 }
 
 
-playerguess()
+int playerguess()
 {
     int true[WIDTH];
     int guess[WIDTH];
@@ -80,7 +91,7 @@ playerguess()
     /* Make up random true. */
     randcode(true);
     /* output(true);  REMOVE THIS LATER! */
-    printf("\nOkay, I've made up a secret length-%d code.  ", WIDTH);
+    printf("\nOkay, I've made up a secret code with length -> %d .  ", WIDTH);
     showcolours();
 
     numexact=-1;
@@ -88,6 +99,8 @@ playerguess()
 
 	guessnum++;
 	invalid = 1;
+	
+	/* Ends when you guess the code */
 	while (invalid==1) {
 	    fflush(stdin);
 	    printf("\nYour guess #%d:  ", guessnum);
@@ -95,7 +108,7 @@ playerguess()
 	    strncpy(inputstring, inputline, WIDTH+1);
 	    convert(inputstring, guess);
 	}
-	printf("\nYour guess #%d is: ", guessnum);
+	printf("\nYour attempt #%d is: ", guessnum);
 	output(guess);
 
 	countmatches(true, guess);
@@ -108,7 +121,7 @@ playerguess()
 }
 
 
-computerguess()
+int computerguess()
 {
     int guesses[MAXGUESSES][WIDTH];
     int guessnum = 0;
@@ -183,7 +196,7 @@ if (giveup==0) {
 }
 
 
-convert(char string[WIDTH+1], int result[WIDTH])
+int convert(char string[WIDTH+1], int result[WIDTH])
 {
     invalid = 0;
 
@@ -210,7 +223,7 @@ convert(char string[WIDTH+1], int result[WIDTH])
 }
 
 
-countmatches(int data1[WIDTH], int data2[WIDTH])
+int countmatches(int data1[WIDTH], int data2[WIDTH])
 {
     int counts1[NUMCOLS];
     int counts2[NUMCOLS];
@@ -238,14 +251,14 @@ countmatches(int data1[WIDTH], int data2[WIDTH])
 
 }
 
-randcode(int result[WIDTH])
+int randcode(int result[WIDTH])
 {
     int match;
 
     for (i=0; i<WIDTH; i++) {
 	match = 1;
 	while (match==1) {
-	    result[i] = ifloor( NUMCOLS * drand48() );
+	    result[i] = IntfloorReturn( NUMCOLS * drand48() );
 	    match = 0;
 	    if (i>0) {
 	        for (j=0; j<i; j++) {
@@ -258,29 +271,8 @@ randcode(int result[WIDTH])
     }
 }
 
-/*randcode(int result[WIDTH])
-{
-    int match;
 
-    for (i=0; i<WIDTH; i++) {
-	match = 1;
-	while (match==1) {
-	    result[i] = ifloor( NUMCOLS * drand48() );
-	    match = 0;
-	    if (i>0) {
-	        for (j=0; j<i; j++) {
-		    if (result[j]==result[i]) {
-		        match=1;
-		    }
-		}
-	    }
-	}
-    }
-}
-*/
-
-
-output(int therow[WIDTH])
+char output(int therow[WIDTH])
 {
     for (i=0; i<WIDTH; i++) {
         printf("%c", colour[therow[i]]);
@@ -289,11 +281,16 @@ output(int therow[WIDTH])
 }
 
 
-showcolours()
+int showcolours()
 {
-    printf("Colours are: ");
-    for (j=0; j<NUMCOLS; j++)
-	printf("%c  ", colour[j]);
+    printf("Colours are: [");
+    for (j=0; j<NUMCOLS; j++){
+        if(j == NUMCOLS-1)
+            printf("%c]", colour[j]);
+        else
+            printf("%c, ", colour[j]);
+    }
+	
     printf("\n");
 }
 
@@ -307,14 +304,14 @@ int min(int aa, int bb)
 
 
 /* IFLOOR */
-ifloor(double x)  /* returns floor(x) as an integer */
+int IntfloorReturn(double x)  /* returns floor(x) as an integer */
 {
     return((int)floor(x));
 }
     
     
 /* SEEDRAND: SEED RANDOM NUMBER GENERATOR. */
-seedrand()
+int seedrand()
 {
     int i, seed;
     struct timeval tmptv;
