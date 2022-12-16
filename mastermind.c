@@ -65,7 +65,7 @@ int main()
     printf("\n___________________________________\n");
 
     while (1) {
-        printf("\nChoose [p]layer or [c]omputer to guess: ");
+        printf("\nChoose [p]layer or [c]omputer to guess the secret code: ");
 	fgets(inputline, 160, stdin);
 	if ( (sscanf(inputline, "%c", &c)) > 0 ) {
 	    if ( (c=='p') || (c=='P') )
@@ -112,7 +112,7 @@ int playerguess()
 	output(guess);
 
 	countmatches(true, guess);
-	printf(".     numExact = %d;  numWrongPlace = %d.\n", numexact, nummissed);
+	printf(".     AllExact = %d;  ExactNumWrongPlace = %d.\n", numexact, nummissed);
 
     }
 
@@ -121,6 +121,7 @@ int playerguess()
 }
 
 
+/*togliere se non riesco a capirlo*/
 int computerguess()
 {
     int guesses[MAXGUESSES][WIDTH];
