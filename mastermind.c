@@ -1,331 +1,377 @@
-/*
-==========================================================================
-
-mastermind.c - a simple text-based C program which simulates the game "mastermind"
-
-Copyright (c) 2022 by Znaidi M. Anas.
-
-Github repo: https://github.com/Zeta-Naidi/Mastermind-in-C
-
-==========================================================================
-*/
-
+/*		Libraries		*/
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
-#include <math.h>
+#include <time.h>
+#include<unistd.h>
 #include <string.h>
+#include <ctype.h>
 
-#define WIDTH 5
-#define NUMCOLS 6
-#define MAXGUESSES 10
+/*		MACROS		*/
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 
-char colour[NUMCOLS+1];
-int invalid;
-char inputline[161];
-char inputstring[WIDTH+1];
+/*		Global Variables		*/
+char secretCode[4];
+char rows[8][4];
+char tries[8][4];
+char hiden[4];
 
-int numexact;
-int nummissed;
-int i,j;
-int MAXNUMTRIES;
+/*		Function Prototypes		*/
+void masterMind(void);
+void title(void);
+void generateSecretCode(void);
+void printBoard(void);
+void instructions(void);
+void good_bye(void);
+void initializeBoard(void);
+void startGame(void);
+void motor(int chances);
+int check_input(char *number);
+void combo(void);
+void lose(void);
+void compare(int chances, char *number);
+void congratulations(void);
+void fill_rows(int chances, int black, int white);
 
-int playerguess();
-int computerguess();
-int convert(char string[WIDTH+1], int result[WIDTH]);
-int countmatches(int data1[WIDTH], int data2[WIDTH]);
-int randcode(int result[WIDTH]);
-char output(int therow[WIDTH]);
-int showcolours();
-int min(int aa, int bb);
-int IntfloorReturn(double x);
-int seedrand();
 
-int main()
+int main(void)
 {
-    int true[WIDTH];
-    int guess[WIDTH];
-    int guessnum;
-    char c;
-
-    seedrand();
-
-    colour[0] = 'R';
-    colour[1] = 'G';
-    colour[2] = 'B';
-    colour[3] = 'Y';
-    colour[4] = 'O';
-    colour[5] = 'P';
-    //colour[6] = 'W';
-    //colour[7] = 'E';
-    //colour[8] = 'A';
-    //colour[9] = 'I';
-
-    //MAXNUMTRIES = 12000;
-    MAXNUMTRIES = 1000 * pow(NUMCOLS, WIDTH);
-
-    printf("\n***********************************\n");
-      printf("WELCOME TO MASTERMIND, made by ZETA.");
-    printf("\n___________________________________\n");
-
-    while (1) {
-        printf("\nChoose [p]layer or [c]omputer to guess the secret code: ");
-	fgets(inputline, 160, stdin);
-	if ( (sscanf(inputline, "%c", &c)) > 0 ) {
-	    if ( (c=='p') || (c=='P') )
-		playerguess();
-	    else if ( (c=='c') || (c=='C') )
-		computerguess();
-	    else
-		printf("Invalid response!\n");
-        }
-    }
-
-    exit(0);
-
+	masterMind();
+	return (0);
 }
 
-
-int playerguess()
+/**
+ * masterMind - function to start the game
+ * Return: void
+ */
+void masterMind(void)
 {
-    int true[WIDTH];
-    int guess[WIDTH];
-    int guessnum = 0;
-
-    /* Make up random true. */
-    randcode(true);
-    
-    output(true); /* Print secret code __ REMOVE THIS LATER! */
-    printf("\nOkay, I've made up a secret code with length -> %d .  ", WIDTH);
-    showcolours();
-
-    numexact=-1;
-    while (numexact<WIDTH) {
-
-	guessnum++;
-	invalid = 1;
-	
-	/* Ends when you guess the code */
-	while (invalid==1) {
-	    fflush(stdin);
-	    printf("\nYour guess #%d:  ", guessnum);
-	    fgets(inputline, 160, stdin);
-	    strncpy(inputstring, inputline, WIDTH+1);
-	    convert(inputstring, guess);
-	}
-	printf("\nYour attempt #%d is: ", guessnum);
-	output(guess);
-
-	countmatches(true, guess);
-	printf(".     AllExact = %d;  ExactNumWrongPlace = %d.\n", numexact, nummissed);
-
-    }
-
-    printf("\nYou win in %d guesses!\n\n", guessnum);
-
+	title();
+	instructions();
 }
-
-
-/*togliere se non riesco a capirlo*/
-int computerguess()
+/**
+ * initializeBoard - function to initialize the board
+ * Return: void
+ */
+void initializeBoard(void)
 {
-    int guesses[MAXGUESSES][WIDTH];
-    int guessnum = 0;
-    int compnum;
-    int matchhistory[MAXGUESSES][2];
-    int possible;
-    int numtries;
-    char inputchar;
-    int giveup = 0;
-    
-    fflush(stdin);
-    printf("\nMake up a string of %d colours (without repetition), and write it down\n", WIDTH);
-    printf("somewhere [DO NOT TYPE IT IN!].  ");
-    showcolours();
-    printf("Then press return [AND ONLY RETURN!]:  ");
-    fgets(inputline, 160, stdin);
+	int i, j;
 
-    numexact=-1;
-    while ( (numexact<WIDTH) && (giveup==0) ) {
-        guessnum++;
-	possible = numtries = 0;
-	while (possible==0) {
-	    numtries++;
-	    if (numtries >= MAXNUMTRIES) {
-	        printf("\nHm ... I think you're lying ... I give up!\n\n");
-		giveup = 1;
-                break;
-	    }
-	    randcode(guesses[guessnum]);
-	    possible = 1;
-	    if (guessnum>1) {
-	        for(compnum=1; compnum<guessnum; compnum++) {
-		    countmatches(guesses[guessnum], guesses[compnum]);
-		    if ( (numexact!=matchhistory[compnum][0]) ||
-		            (nummissed!=matchhistory[compnum][1]) ) {
-			possible = 0;
-			break;
-		    }
+	for (j = 0; j < 4; j++)
+		hiden[j] = '?';
+	for (i = 0; i < 8; i++)
+	{
+		for (j = 0; j < 4; j++)
+		{
+			rows[i][j] = '_';
+			tries[i][j] = '_';
 		}
-	    }
 	}
-
-if (giveup==0) {
-	printf("\nMy guess #%d is:  ", guessnum);
-	output(guesses[guessnum]);
-	printf("\n");
-	numexact = nummissed = -1;
-	while ( (numexact<0) || (numexact>WIDTH) ) {
-	    printf("Input number matching exactly (followed by return):  ");
-	    fgets(inputline, 160, stdin);
-	    if ( (sscanf(inputline, "%d", &numexact) == 0) || 
-				(numexact<0) || (numexact>WIDTH) )
-		    printf("\nInvalid response!\n\n");
-	}
-	while ( (numexact<WIDTH) && ((nummissed<0) || (nummissed>WIDTH)) ) {
-	    printf("Input number matching colour but not position (followed by return): ");
-	    fgets(inputline, 160, stdin);
-	    if ( (sscanf(inputline, "%d", &nummissed) == 0) || 
-	    			(nummissed<0) || (nummissed>WIDTH) )
-                printf("\nInvalid response!\n\n");
-	}
-    printf("Thank you.\n");
-	matchhistory[guessnum][0] = numexact;
-	matchhistory[guessnum][1] = nummissed;
 }
-
-    }
-
-    if (giveup==0)
-	printf("\nI win, in %d guesses!\n\n", guessnum);
-
-}
-
-
-int convert(char string[WIDTH+1], int result[WIDTH])
+/**
+ * startGame - function with the main loop to game
+ * Return: void
+ */
+void startGame(void)
 {
-    invalid = 0;
+	int chances = 7;
 
-    for (i=0; i<WIDTH; i++) {
-	result[i] = -1;
-        if ( (string[i] >= '0') && (string[i] < '0'+NUMCOLS) ) {
-	    result[i] = string[i] - '0';
-	} else {
-	    for (j=0; j<NUMCOLS; j++) {
-		if ( (string[i] == colour[j]) || 
-				(string[i] == colour[j] + 'a' - 'A') ) {
-	            result[i] = j;
+	generateSecretCode();
+	initializeBoard();
+	while (1 && chances >= 0)
+	{
+		system("clear");
+		title();
+		printBoard();
+		motor(chances);
+		chances--;
+	}
+	lose();
+}
+/**
+ * congratulations - function to congrats the player when guess the secret code
+ * Return: void
+ */
+void congratulations(void)
+{
+	char *cgrts1 = ANSI_COLOR_RED "\t  ______   ______   .__   __.   _______ .______           ___      .___________. __    __   __           ___      .___________. __    ______   .__   __.      _______.\n" ANSI_COLOR_RESET;
+	char *cgrts2 = ANSI_COLOR_RED "\t /      | /  __  \\  |  \\ |  |  /  _____||   _  \\         /   \\     |           ||  |  |  | |  |         /   \\     |           ||  |  /  __  \\  |  \\ |  |     /       |\n" ANSI_COLOR_RESET;
+	char *cgrts3 = ANSI_COLOR_RED "\t|  ,----'|  |  |  | |   \\|  | |  |  __  |  |_)  |       /  ^  \\    `---|  |----`|  |  |  | |  |        /  ^  \\    `---|  |----`|  | |  |  |  | |   \\|  |    |   (----`\n" ANSI_COLOR_RESET;
+	char *cgrts4 = ANSI_COLOR_RED "\t|  |     |  |  |  | |  . `  | |  | |_ | |      /       /  /_\\  \\       |  |     |  |  |  | |  |       /  /_\\  \\       |  |     |  | |  |  |  | |  . `  |     \\   \\    \n" ANSI_COLOR_RESET;
+	char *cgrts5 = ANSI_COLOR_RED "\t|  `----.|  `--'  | |  |\\   | |  |__| | |  |\\  \\----. /  _____  \\      |  |     |  `--'  | |  `----. /  _____  \\      |  |     |  | |  `--'  | |  |\\   | .----)   |   \n" ANSI_COLOR_RESET;
+	char *cgrts6 = ANSI_COLOR_RED "\t \\______| \\______/  |__| \\__|  \\______| | _| `._____|/__/     \\__\\     |__|      \\______/  |_______|/__/     \\__\\     |__|     |__|  \\______/  |__| \\__| |_______/    \n" ANSI_COLOR_RESET;
+
+	system("clear");
+	printf("%s%s%s%s%s%s", cgrts1, cgrts2, cgrts3, cgrts4, cgrts5, cgrts6);
+	exit(EXIT_SUCCESS);
+}
+/**
+ * check_input - function to avoid no numeric characters as input
+ * @number: the number from the input of the player
+ * Return: 0 if all the characters are numbers, otherwise -1
+ */
+int check_input(char *number)
+{
+	int i;
+
+	for (i = 0; i < 4; i++)
+		if (!isdigit(number[i]))
+			return (0);
+	return (1);
+}
+
+void generateSecretCode(void)
+{
+	int i, n;
+
+	srand(time(0));
+	for (i = 0; i < 4; i++)
+	{
+		n = (rand() % 6) + 49;
+		if (secretCode[0] == n || secretCode[1] == n
+		|| secretCode[2] == n || secretCode[3] == n)
+			i--;
+		else
+			secretCode[i] = n;
+	}
+}
+/**
+ * motor - function to get the input from the user
+ * @chances: counter for the amount of chances that the player has
+ * Return: void
+ */
+void motor(int chances)
+{
+	char *number = NULL;
+	size_t size = 0;
+	int c, length;
+
+	if (number)
+		free(number);
+	c = getline(&number, &size, stdin);
+	if (c == EOF)
+	{
+		free(number);
+		good_bye();
+	}
+	length = strlen(number);
+	if (length > 5)
+	{
+		combo();
+		printf("\t\t\t\t\t\t\t\tNo more than four digits\n");
+		motor(chances);
+	}
+	else if (length < 5)
+	{
+		combo();
+		printf("\t\t\t\t\t\t\t\tNo less than four digits\n");
+		motor(chances);
+	}
+	else
+		if (check_input(number))
+			compare(chances, number);
+		else
+		{
+			combo();
+			printf("\t\t\t\t\t\t\t     Please type only numeric digits\n");
+			motor(chances);
 		}
-	    }
-	}
-	if (result[i]==-1) {
-	    invalid = 1;
-        }
-    }
-    if (invalid==1) {
-	printf("\nInvalid guess!  ");
-	showcolours();
-    }
+	free(number);
 }
-
-
-int countmatches(int data1[WIDTH], int data2[WIDTH])
+/**
+ * combo - function to clear screen, print the title and the board
+ * Return: void
+ */
+void combo(void)
 {
-    int counts1[NUMCOLS];
-    int counts2[NUMCOLS];
-
-    for (i=0; i<NUMCOLS; i++) {
-        counts1[i] = counts2[i] = 0;
-    }
-
-    for (i=0; i<WIDTH; i++) {
-        counts1[data1[i]]++;
-        counts2[data2[i]]++;
-    }
-
-    numexact = nummissed = 0;
-
-    for (i=0; i<WIDTH; i++) {
-        if (data1[i] == data2[i])
-	    numexact++;
-    }
-
-    for (j=0; j<NUMCOLS; j++) {
-        nummissed = nummissed + min(counts1[j], counts2[j]);
-    }
-    nummissed = nummissed - numexact;
-
+	system("clear");
+	title();
+	printBoard();
 }
-
-int randcode(int result[WIDTH])
+/**
+ * compare - function to compare the input of the player and the secret Code
+ * @chances: counter for the amount of chances that the player has
+ * @number: the number from the input of the player
+ * Return: void
+ */
+void compare(int chances, char *number)
 {
-    int match;
+	int i, j, k, black_asserts = 0, white_asserts = 0;
+	char *copy = NULL;
 
-    for (i=0; i<WIDTH; i++) {
-	match = 1;
-	while (match==1) {
-	    result[i] = IntfloorReturn( NUMCOLS * drand48() );
-	    match = 0;
-	    if (i>0) {
-	        for (j=0; j<i; j++) {
-		    if (result[j]==result[i]) {
-		        match=1;
-		    }
+	copy = strdup(secretCode);
+	/* compare black key pegs */
+	for (i = 0; i < 4; i++)
+		if (number[i] == copy[i])
+		{
+			black_asserts++;
+			copy[i] = '0';
 		}
-	    }
+	if (black_asserts == 4)
+		congratulations();
+	/* compare white key pegs */
+	for (j = 0; j < 4; j++)
+	{
+		for (k = 0; k < 4; k++)
+		{
+			if (copy[j] == number[k] && copy[j] != '0')
+			{
+				white_asserts++;
+				copy[j] = '0';
+				break;
+			}
+		}
 	}
-    }
+	for (i = 0; i < 4; i++)
+		tries[chances][i] = number[i];
+	free(copy);
+	fill_rows(chances, black_asserts, white_asserts);
+}
+/**
+ * fill_rows - function to fill the slot of the game
+ * @chances: counter for the amount of chances that the player has
+ * @black: the amount of correct matches that the player made
+ * @white: the amount of numbers in the secret code but does not matche
+ * Return: void
+ */
+void fill_rows(int chances, int black, int white)
+{
+	int i, j;
+
+	for (i = 0; i < black; i++)
+		rows[chances][i] = 'X';
+	for (j = 0; j < white; i++, j++)
+		rows[chances][i] = 'O';
 }
 
-
-char output(int therow[WIDTH])
+/**
+ * title - function to print the main title of the game
+ * Return: void
+ */
+void title(void)
 {
-    for (i=0; i<WIDTH; i++) {
-        printf("%c", colour[therow[i]]);
-    }
-    /* printf("\n"); */
+	char *title1 = ANSI_COLOR_GREEN ".___  ___.      ___           _______.___________. _______ .______      .___  ___.  __  .__   __.  _______       _______      ___      .___  ___.  _______ \n" ANSI_COLOR_RESET;
+	char *title2 = ANSI_COLOR_GREEN "|   \\/   |     /   \\         /       |           ||   ____||   _  \\     |   \\/   | |  | |  \\ |  | |       \\     /  _____|    /   \\     |   \\/   | |   ____|\n" ANSI_COLOR_RESET;
+	char *title3 = ANSI_COLOR_GREEN "|  \\  /  |    /  ^  \\       |   (----`---|  |----`|  |__   |  |_)  |    |  \\  /  | |  | |   \\|  | |  .--.  |   |  |  __     /  ^  \\    |  \\  /  | |  |__   \n" ANSI_COLOR_RESET;
+	char *title4 = ANSI_COLOR_GREEN "|  |\\/|  |   /  /_\\  \\       \\   \\       |  |     |   __|  |      /     |  |\\/|  | |  | |  . `  | |  |  |  |   |  | |_ |   /  /_\\  \\   |  |\\/|  | |   __|  \n" ANSI_COLOR_RESET;
+	char *title5 = ANSI_COLOR_GREEN "|  |  |  |  /  _____  \\  .----)   |      |  |     |  |____ |  |\\  \\----.|  |  |  | |  | |  |\\   | |  '--'  |   |  |__| |  /  _____  \\  |  |  |  | |  |____ \n" ANSI_COLOR_RESET;
+	char *title6 = ANSI_COLOR_GREEN "|__|  |__| /__/     \\__\\ |_______/       |__|     |_______|| _| `._____||__|  |__| |__| |__| \\__| |_______/     \\______| /__/     \\__\\ |__|  |__| |_______|\n" ANSI_COLOR_RESET;
+	char *title7 = ANSI_COLOR_GREEN "\t\t\t\t\t             _   _     _                                     _                         \n" ANSI_COLOR_RESET;
+	char *title8 = ANSI_COLOR_GREEN "\t\t\t\t\t __      __ (_) | |_  | |__      _ __    _   _   _ __ ___   | |__     ___   _ __   ___ \n" ANSI_COLOR_RESET;
+	char *title9 = ANSI_COLOR_GREEN "\t\t\t\t\t \\ \\ /\\ / / | | | __| | '_ \\    | '_ \\  | | | | | '_ ` _ \\  | '_ \\   / _ \\ | '__| / __|\n" ANSI_COLOR_RESET;
+	char *title10 = ANSI_COLOR_GREEN "\t\t\t\t\t  \\ V  V /  | | | |_  | | | |   | | | | | |_| | | | | | | | | |_) | |  __/ | |    \\__ \\\n" ANSI_COLOR_RESET;
+	char *title11 = ANSI_COLOR_GREEN "\t\t\t\t\t   \\_/\\_/   |_|  \\__| |_| |_|   |_| |_|  \\__,_| |_| |_| |_| |_.__/   \\___| |_|    |___/" ANSI_COLOR_RESET;
+
+	system("clear");
+	printf("%s%s%s%s%s%s%s%s%s%s%s\n\n\n", title1, title2, title3, title4, title5, title6, title7, title8, title9, title10, title11);
 }
-
-
-int showcolours()
+/**
+ * printBoard - function to print the board
+ * Return: void
+ */
+void printBoard(void)
 {
-    printf("Colours are: [");
-    for (j=0; j<NUMCOLS; j++){
-        if(j == NUMCOLS-1)
-            printf("%c]", colour[j]);
-        else
-            printf("%c, ", colour[j]);
-    }
-	
-    printf("\n");
+	int i, j;
+
+	printf("\t\t\t\t\t\t\t\t");
+	for (j = 0; j < 4; j++)
+		printf("%c	 ", hiden[j]);
+	putchar(10);
+	for (i = 0; i < 8; i++)
+	{
+		printf("\t\t\t\t\t\t\t\t");
+		for (j = 0; j < 4; j++)
+			printf("%c	 ", rows[i][j]);
+		putchar(10);
+		printf("\t\t\t\t\t\t\t\t");
+		for (j = 0; j < 4; j++)
+			printf(ANSI_COLOR_CYAN "%c	 " ANSI_COLOR_RESET, tries[i][j]);
+		putchar(10);
+	}
+	printf("\n\t\t\t\t\t\tEvery X means that one of your numbers is in the right place,\n");
+	printf("\t\t\t\tand every O means that one of your numbers is in the secret Code but in the wrong place\n");
+	printf("\n\t\t\t\t\t\t    X --> CORRECT POSITION      O --> WRONG POSITION");
+	printf("\n\n\t\t\t\t\t\t\t      Write a number of four digits\n");
 }
-
-
-int min(int aa, int bb)
+/**
+ * instructions - function to explain the game at the beginning
+ * Return: void
+ */
+void instructions(void)
 {
-    if (aa<bb)
-        return(aa);
-    return(bb);
+	char next;
+
+	printf("\n\n\t\t\t\tHow to play: The computer will select a secret number with four different (unique) digits.\n");
+	puts("\t\t\t\tThe object of the game is to guess that secret number, it will be composed from 1 to 6\n");
+	puts("\t\t\t\t\t     Each guess is answered by the number of digits in the guess");
+	puts("\t\t\t\tnumber that match or occur in the secret number. You will also be told how many of the digits");
+	puts("\t\t\t\t\t\t    are in the correct position in the secret number.");
+	puts("\t\t\t\tThrough a process of elimination, you should be able to deduce the correct digits using logic.");
+	printf("\n\t\t\t\t\t\t    X --> CORRECT POSITION      O --> WRONG POSITION");
+	printf("\n\t\t\t\t\t    You will have only eight chances. Press Enter to start the game!");
+	printf("\n\n\t\t\t\t\t\t\t\tPress Ctrl + D to exit any moment\n");
+	next = getchar();
+	if (next == EOF)
+	{
+		system("clear");
+		good_bye();
+		sleep(2);
+		exit(EXIT_SUCCESS);
+	}
+	else if (next == 10)
+		startGame();
 }
-
-
-/* IFLOOR */
-int IntfloorReturn(double x)  /* returns floor(x) as an integer */
+/**
+ * good_bye - function to say good bye to the player
+ * Return: void
+ */
+void good_bye(void)
 {
-    return((int)floor(x));
+	char *bye1 = ANSI_COLOR_BLUE "\t\t                              _     _                      _ \n" ANSI_COLOR_RESET;
+	char *bye2 = ANSI_COLOR_BLUE "\t\t   __ _    ___     ___     __| |   | |__    _   _    ___  | |\n" ANSI_COLOR_RESET;
+	char *bye3 = ANSI_COLOR_BLUE "\t\t  / _` |  / _ \\   / _ \\   / _` |   | '_ \\  | | | |  / _ \\ | |\n" ANSI_COLOR_RESET;
+	char *bye4 = ANSI_COLOR_BLUE "\t\t | (_| | | (_) | | (_) | | (_| |   | |_) | | |_| | |  __/ |_|\n" ANSI_COLOR_RESET;
+	char *bye5 = ANSI_COLOR_BLUE "\t\t  \\__, |  \\___/   \\___/   \\__,_|   |_.__/   \\__, |  \\___| (_)\n" ANSI_COLOR_RESET;
+	char *bye6 = ANSI_COLOR_BLUE "\t\t  |___/                                     |___/            " ANSI_COLOR_RESET;
+
+	system("clear");
+	printf("%s%s%s%s%s%s\n\n\n\n\n", bye1, bye2, bye3, bye4, bye5, bye6);
+	exit(EXIT_SUCCESS);
 }
-    
-    
-/* SEEDRAND: SEED RANDOM NUMBER GENERATOR. */
-int seedrand()
+/**
+ * lose - function to show when the player lose a game
+ * Return: void
+ */
+void lose(void)
 {
-    int i, seed;
-    struct timeval tmptv;
-    gettimeofday (&tmptv, (struct timezone *)NULL);
-    /* seed = (int) (tmptv.tv_usec - 1000000 *
-                (int) ( ((double)tmptv.tv_usec) / 1000000.0 ) ); */
-    seed = (int) tmptv.tv_usec;
-    srand48(seed);
-    (void)drand48();  /* Spin it once. */
-    return(0);
+	char *try1 = ANSI_COLOR_RED "\t\t\t\t     _____                                            _           _ \n" ANSI_COLOR_RESET;
+	char *try2 = ANSI_COLOR_RED "\t\t\t\t    |_   _|  _ __   _   _      __ _    __ _    __ _  (_)  _ __   | |\n" ANSI_COLOR_RESET;
+	char *try3 = ANSI_COLOR_RED "\t\t\t\t      | |   | '__| | | | |    / _` |  / _` |  / _` | | | | '_ \\  | |\n" ANSI_COLOR_RESET;
+	char *try4 = ANSI_COLOR_RED "\t\t\t\t      | |   | |    | |_| |   | (_| | | (_| | | (_| | | | | | | | |_|\n" ANSI_COLOR_RESET;
+	char *try5 = ANSI_COLOR_RED "\t\t\t\t      |_|   |_|     \\__, |    \\__,_| \\__,  |  \\__,_| |_| |_| |_| (_)\n" ANSI_COLOR_RESET;
+	char *try6 = ANSI_COLOR_RED "\t\t\t\t                    |___/             |___/                         " ANSI_COLOR_RESET;
+	char next;
+	int i;
+
+	system("clear");
+	printf("%s%s%s%s%s%s\n", try1, try2, try3, try4, try5, try6);
+	printf("\n\t\t\t\t\t\t\tThe Secret Code was ");
+	for (i = 0; i < 4; i++)
+		printf("%c", secretCode[i]);
+	printf("\n\t\t\t\t\t    Press Ctrl + D to exit or Enter to start a new game!\n");
+	next = getchar();
+	if (next == EOF)
+	{
+		system("clear");
+		good_bye();
+		sleep(2);
+		exit(EXIT_SUCCESS);
+	}
+	else
+		startGame();
 }
