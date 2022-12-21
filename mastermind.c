@@ -313,7 +313,7 @@ void instructions(void)
 	puts("\t\t\t\t\t\t    are in the correct position in the secret number.");
 	puts("\t\t\t\tThrough a process of elimination, you should be able to deduce the correct digits using logic.");
 	printf("\n\t\t\t\t\t\t    X --> CORRECT POSITION      O --> WRONG POSITION");
-	printf("\n\t\t\t\t\t    You will have only eight chances. Press Enter to start the game!");
+	printf("\n\t\t\t\t\t    You will have only eight chances. Press ENTER to start the game!");
 	printf("\n\n\t\t\t\t\t\t\t\tPress Ctrl + D to exit any moment\n");
 	next = getchar();
 	if (next == EOF)
@@ -363,7 +363,7 @@ void lose(void)
 	printf("\n\t\t\t\t\t\t\tThe Secret Code was ");
 	for (i = 0; i < 4; i++)
 		printf("%c", secretCode[i]);
-	printf("\n\t\t\t\t\t    Press Ctrl + D to exit or Enter to start a new game!\n");
+	printf("\n\t\t\t\t\t    Press Ctrl + D to exit or ENTER to start a new game!\n");
 	next = getchar();
 	if (next == EOF)
 	{
