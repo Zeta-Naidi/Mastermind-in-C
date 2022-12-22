@@ -306,15 +306,14 @@ void instructions(void)
 {
 	char next;
 
-	printf("\n\n\t\t\t\tHow to play: The computer will select a secret number with four different (unique) digits.\n");
-	puts("\t\t\t\tThe object of the game is to guess that secret number, it will be composed from 1 to 6\n");
-	puts("\t\t\t\t\t     Each guess is answered by the number of digits in the guess");
-	puts("\t\t\t\tnumber that match or occur in the secret number. You will also be told how many of the digits");
-	puts("\t\t\t\t\t\t    are in the correct position in the secret number.");
-	puts("\t\t\t\tThrough a process of elimination, you should be able to deduce the correct digits using logic.");
-	printf("\n\t\t\t\t\t\t    X --> CORRECT POSITION      O --> WRONG POSITION");
-	printf("\n\t\t\t\t\t    You will have only eight chances. Press ENTER to start the game!");
-	printf("\n\n\t\t\t\t\t\t\t\tPress Ctrl + D to exit any moment\n");
+	printf("\n\n\t\t\t\t\t\tHow to play: Il computer genererà un codice segrato di 4 (distinti) numeri.\n");
+	puts("\t\t\t\t\t\tLo scopo del gioco è scoprire questo codice, sarà composto da numeri tra 1 e 6\n");
+	puts("\t\t\t\t\tPer ogni tentativo verrà stampato il numero di 'numeri' che sono presenti nel codice segreto");
+	puts("\t\t\t\t\t Ti verrà anche detto quante delle cifre sono nella posizione corretta nel numero segreto.");
+	puts("\t\t\t\tAttraverso un processo di eliminazione, dovresti essere in grado di dedurre i numeri corretti utilizzando la logica.");
+	printf("\n\t\t\t\t\t\t\t    X --> CORRECT POSITION      O --> WRONG POSITION");
+	printf("\n\t\t\t\t\t\tAvrai a disposizione soltanto 8 possibilità. Premi ENTER per iniziare il gioco!");
+	printf("\n\n\t\t\t\t\t\t\t\t[ Premi Ctrl + D per uscire in qualsiasi momento ]\n");
 	next = getchar();
 	if (next == EOF)
 	{
