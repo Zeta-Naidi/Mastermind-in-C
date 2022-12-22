@@ -163,13 +163,13 @@ void motor(int chances)
 	if (length > 5)
 	{
 		combo();
-		printf("\t\t\t\t\t\t\t\tNo more than four digits\n");
+		printf("\t\t\t\t\t\t\t\tMassimo 4 cifre\n");
 		motor(chances);
 	}
 	else if (length < 5)
 	{
 		combo();
-		printf("\t\t\t\t\t\t\t\tNo less than four digits\n");
+		printf("\t\t\t\t\t\t\t\tMinimo 4 cifre\n");
 		motor(chances);
 	}
 	else
@@ -178,7 +178,7 @@ void motor(int chances)
 		else
 		{
 			combo();
-			printf("\t\t\t\t\t\t\t     Please type only numeric digits\n");
+			printf("\t\t\t\t\t\t\t     Sono ammessi solo numeri\n");
 			motor(chances);
 		}
 	free(number);
@@ -293,10 +293,10 @@ void printBoard(void)
 			printf(ANSI_COLOR_CYAN "%c	 " ANSI_COLOR_RESET, tries[i][j]);
 		putchar(10);
 	}
-	printf("\n\t\t\t\t\t\tEvery X means that one of your numbers is in the right place,\n");
-	printf("\t\t\t\tand every O means that one of your numbers is in the secret Code but in the wrong place\n");
-	printf("\n\t\t\t\t\t\t    X --> CORRECT POSITION      O --> WRONG POSITION");
-	printf("\n\n\t\t\t\t\t\t\t      Write a number of four digits\n");
+	printf("\n\t\t\t\t\t\tOgni X indica che uno dei numeri è nella posizione giusta,\n");
+	printf("\t\t\t\te ogni O indica che uno dei numeri è all'interno del Codice segreto ma nella posizione sbagliata\n");
+	printf("\n\t\t\t\t\t\t    X --> POSIZIONE CORRETTA      O --> POSIZIONE SBAGLIATA");
+	printf("\n\n\t\t\t\t\t\t\t      Scrivi un numero di 4 cifre\n");
 }
 /**
  * instructions - function to explain the game at the beginning
