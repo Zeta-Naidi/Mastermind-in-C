@@ -1,2 +1,2 @@
 # Mastermind-in-C
-made  a simple MasterMind game with C
+Semplice implementazione di MasterMind in C
