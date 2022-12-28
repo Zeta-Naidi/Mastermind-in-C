@@ -41,21 +41,12 @@ void fill_rows(int chances, int black, int white);
 
 int main(void)
 {
-	masterMind();
-	return (0);
-}
-
-/**
- * masterMind - function to start the game
- * Return: void
- */
-void masterMind(void)
-{
 	title();
 	instructions();
+	return (0);
 }
 /**
- * initializeBoard - function to initialize the board
+ * initializeBoard - function inizializzare la console
  * Return: void
  */
 void initializeBoard(void)
@@ -74,11 +65,12 @@ void initializeBoard(void)
 	}
 }
 /**
- * startGame - function with the main loop to game
+ * startGame - funzione (main) con il loop del gioco
  * Return: void
  */
 void startGame(void)
 {
+    // max num tries
 	int chances = 7;
 
 	generateSecretCode();
@@ -94,7 +86,7 @@ void startGame(void)
 	lose();
 }
 /**
- * congratulations - function to congrats the player when guess the secret code
+ * congratulations - funzione "congratulations" per la vincita del giocatore
  * Return: void
  */
 void congratulations(void)
@@ -111,9 +103,8 @@ void congratulations(void)
 	exit(EXIT_SUCCESS);
 }
 /**
- * check_input - function to avoid no numeric characters as input
- * @number: the number from the input of the player
- * Return: 0 if all the characters are numbers, otherwise -1
+ * check_input - funzione per evitare input diversi da numeri
+ * ritorna 0 se tutti i 'caratteri' sono numeri, se no ritorna -1
  */
 int check_input(char *number)
 {
@@ -124,7 +115,9 @@ int check_input(char *number)
 			return (0);
 	return (1);
 }
-
+/**
+ * generateSecretCode - genera il codice segreto
+ */
 void generateSecretCode(void)
 {
 	int i, n;
@@ -133,17 +126,15 @@ void generateSecretCode(void)
 	for (i = 0; i < 4; i++)
 	{
 		n = (rand() % 6) + 49;
-		if (secretCode[0] == n || secretCode[1] == n
+		/*if (secretCode[0] == n || secretCode[1] == n
 		|| secretCode[2] == n || secretCode[3] == n)
 			i--;
-		else
-			secretCode[i] = n;
+		else*/
+		secretCode[i] = n;
 	}
 }
 /**
- * motor - function to get the input from the user
- * @chances: counter for the amount of chances that the player has
- * Return: void
+ * motor - funzione per prendere l'input dell'utente
  */
 void motor(int chances)
 {
@@ -184,8 +175,7 @@ void motor(int chances)
 	free(number);
 }
 /**
- * combo - function to clear screen, print the title and the board
- * Return: void
+ * combo - funzione per pulire la console, stampa il titolo e la tavola
  */
 void combo(void)
 {
@@ -194,7 +184,7 @@ void combo(void)
 	printBoard();
 }
 /**
- * compare - function to compare the input of the player and the secret Code
+ * compare - funzione per controlllare che la combinazione inserita dall'utente corrisponda con il codice segreto
  * @chances: counter for the amount of chances that the player has
  * @number: the number from the input of the player
  * Return: void
@@ -233,7 +223,7 @@ void compare(int chances, char *number)
 	fill_rows(chances, black_asserts, white_asserts);
 }
 /**
- * fill_rows - function to fill the slot of the game
+ * fill_rows - funzione per riemire gli spazi nella tavola
  * @chances: counter for the amount of chances that the player has
  * @black: the amount of correct matches that the player made
  * @white: the amount of numbers in the secret code but does not matche
@@ -250,7 +240,7 @@ void fill_rows(int chances, int black, int white)
 }
 
 /**
- * title - function to print the main title of the game
+ * title - funzione per stampare il titolo del gioco
  * Return: void
  */
 void title(void)
@@ -271,7 +261,7 @@ void title(void)
 	printf("%s%s%s%s%s%s%s%s%s%s%s\n\n\n", title1, title2, title3, title4, title5, title6, title7, title8, title9, title10, title11);
 }
 /**
- * printBoard - function to print the board
+ * printBoard - funzione per stamapare la tavola
  * Return: void
  */
 void printBoard(void)
@@ -299,14 +289,14 @@ void printBoard(void)
 	printf("\n\n\t\t\t\t\t\t\t      Scrivi un numero di 4 cifre\n");
 }
 /**
- * instructions - function to explain the game at the beginning
+ * instructions - funzione per stamapare la istruzioni
  * Return: void
  */
 void instructions(void)
 {
 	char next;
 
-	printf("\n\n\t\t\t\t\t\tHow to play: Il computer genererà un codice segrato di 4 (distinti) numeri.\n");
+	printf("\n\n\t\t\t\t\t\tHow to play: Il computer genererà un codice segrato di 4 numeri.\n");
 	puts("\t\t\t\t\t\tLo scopo del gioco è scoprire questo codice, sarà composto da numeri tra 1 e 6\n");
 	puts("\t\t\t\t\tPer ogni tentativo verrà stampato il numero di 'numeri' che sono presenti nel codice segreto");
 	puts("\t\t\t\t\t Ti verrà anche detto quante delle cifre sono nella posizione corretta nel numero segreto.");
@@ -326,7 +316,7 @@ void instructions(void)
 		startGame();
 }
 /**
- * good_bye - function to say good bye to the player
+ * good_bye - funzione per salutare il giocatore
  * Return: void
  */
 void good_bye(void)
@@ -343,7 +333,7 @@ void good_bye(void)
 	exit(EXIT_SUCCESS);
 }
 /**
- * lose - function to show when the player lose a game
+ * lose - funzione che mostra 'Try again' quando il giocatore perde
  * Return: void
  */
 void lose(void)
@@ -359,10 +349,10 @@ void lose(void)
 
 	system("clear");
 	printf("%s%s%s%s%s%s\n", try1, try2, try3, try4, try5, try6);
-	printf("\n\t\t\t\t\t\t\tThe Secret Code was ");
+	printf("\n\t\t\t\t\t\t\tIl codice segreto era: ");
 	for (i = 0; i < 4; i++)
 		printf("%c", secretCode[i]);
-	printf("\n\t\t\t\t\t    Press Ctrl + D to exit or ENTER to start a new game!\n");
+	printf("\n\t\t\t\t\t    Premi Ctrl + D per uscire oppure ENTER per iniziare una nuova partita!\n");
 	next = getchar();
 	if (next == EOF)
 	{
