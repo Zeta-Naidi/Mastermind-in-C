@@ -10,11 +10,6 @@
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
 #define ANSI_COLOR_BLUE    "\x1b[34m"
-
-
-
-
-
 #define ANSI_COLOR_YELLOW  "\x1b[33m"
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
 #define ANSI_COLOR_CYAN    "\x1b[36m"
@@ -34,7 +29,7 @@ void instructions(void);
 void good_bye(void);
 void initializeBoard(void);
 void startGame(void);
-void motor(int chances);
+void user_input(int chances);
 int check_input(char *number);
 void combo(void);
 void lose(void);
@@ -78,7 +73,7 @@ void instructions(void)
 	char next;
 
 	printf("\n\n\t\t\t\t\t\tREGOLAMENTO: Il computer genererà un Codice Segreto di 4 numeri.\n");
-	puts("\t\t\t\t\t\tLo scopo del gioco è scoprire questo codice, sarà composto da numeri tra 1 e 6\n");
+	puts("\t\t\t\t\t\tLo scopo del gioco è indovinare il Codice (numeri tra 1 e 6) entro 8 tentativi\n");
 	puts("\t\t\t\t\tPer ogni tentativo verrà stampato il numero di 'numeri' che sono presenti nel Codice Segreto");
 	puts("\t\t\t\t\t Ti verrà anche detto quante delle cifre sono nella posizione corretta nel numero segreto.");
 	puts("\t\t\t\tAttraverso un processo di eliminazione, dovresti essere in grado di dedurre i numeri corretti utilizzando la logica.");
@@ -86,7 +81,7 @@ void instructions(void)
 	printf("\n\t\t\t\t\t\tAvrai a disposizione soltanto 8 possibilità. Premi ENTER per iniziare il gioco!");
 	printf("\n\n\t\t\t\t\t\t\t\t[ Premi Ctrl + D per uscire in qualsiasi momento ]\n");
 	next = getchar();
-	//EOF = End Of File -- End Of Line
+	//EOF = End Of File -- End Of Line = Ctrl + D
 	if (next == EOF)
 	{
 		system("clear");
@@ -112,7 +107,7 @@ void startGame(void)
 		system("clear");
 		title();
 		printBoard();
-		motor(chances);
+		user_input(chances);
 		chances--;
 	}
 	lose();
@@ -171,10 +166,10 @@ int check_input(char *number)
 	return (1);
 }
 /**
- * motor - funzione per prendere l'input dell'utente
+ * user_input - funzione per prendere l'input dell'utente
  * compreso di controlli sul tipo e sulla lunghezza
  */
-void motor(int chances)
+void user_input(int chances)
 {
 	char *number = NULL;
 	size_t size = 0;
@@ -192,23 +187,29 @@ void motor(int chances)
 	if (length > 5)
 	{
 		combo();
-		printf(ANSI_COLOR_RED "\t\t\t\t\t\t\t\t\tMassimo 4 cifre\n" ANSI_COLOR_RED);
-		motor(chances);
+		printf(ANSI_COLOR_RED "\t\t\t\t\t\t\t\t\tMassimo 4 cifre\n" ANSI_COLOR_RESET);
+		user_input(chances);
 	}
 	else if (length < 5)
 	{
 		combo();
-		printf(ANSI_COLOR_RED "\t\t\t\t\t\t\t\t\tMinimo 4 cifre\n" ANSI_COLOR_RED);
-		motor(chances);
+		printf(ANSI_COLOR_RED "\t\t\t\t\t\t\t\t\tMinimo 4 cifre\n" ANSI_COLOR_RESET);
+		user_input(chances);
 	}
+	/*else if (number < 1 || number > 6)
+	{
+		combo();
+		printf(ANSI_COLOR_RED "\t\t\t\t\t\t\tSolo cifre comprese tra 1 e 6\n" ANSI_COLOR_RED);
+		user_input(chances);
+	}*/
 	else
 		if (check_input(number))
 			compare(chances, number);
 		else
 		{
 			combo();
-			printf(ANSI_COLOR_RED "\t\t\t\t\t\t\t\tSono ammessi solo numeri\n" ANSI_COLOR_RED);
-			motor(chances);
+			printf(ANSI_COLOR_RED "\t\t\t\t\t\t\t\tSono ammessi solo numeri\n" ANSI_COLOR_RESET);
+			user_input(chances);
 		}
 	free(number);
 }
