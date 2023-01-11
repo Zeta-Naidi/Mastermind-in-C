@@ -304,6 +304,7 @@ void printBoard(void)
 	printf("\t\t\t\te ogni O indica che uno dei numeri è all'interno del Codice segreto ma nella posizione sbagliata\n");
 	printf("\n\t\t\t\t\t\t    X --> POSIZIONE CORRETTA      O --> POSIZIONE SBAGLIATA");
 	printf("\n\n\t\t\t\t\t\t\t      Scrivi un numero di 4 cifre\n");
+	printf("Codice Segreto: %c %c %c %c \n", secretCode[0], secretCode[1], secretCode[2], secretCode[3]);
 }
 /**
  * congratulations - funzione "congratulations" per la vincita del giocatore
